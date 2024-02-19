@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { useRef, useState, useEffect } from "react";
 import {
   getDownloadURL,
   getStorage,
@@ -13,13 +13,11 @@ import {
   updateUserFailure,
 } from "../redux/user/userSlice";
 import { useDispatch } from "react-redux";
-
-const Profile = () => {
-  const { currentUser, loading, error } = useSelector((state) => state.user);
+export default function Profile() {
   const fileRef = useRef(null);
-
+  const { currentUser, loading, error } = useSelector((state) => state.user);
   const [file, setFile] = useState(undefined);
-  const [filePercentage, setFilePercentage] = useState(0);
+  const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(false);
@@ -42,16 +40,15 @@ const Profile = () => {
       (snapshot) => {
         const progress =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setFilePercentage(Math.round(progress));
-        setFileUploadError(false);
+        setFilePerc(Math.round(progress));
       },
       (error) => {
         setFileUploadError(true);
       },
       () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          setFormData({ ...formData, avatar: downloadURL });
-        });
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) =>
+          setFormData({ ...formData, avatar: downloadURL })
+        );
       }
     );
   };
@@ -73,21 +70,20 @@ const Profile = () => {
       });
       const data = await res.json();
       if (data.success === false) {
-        dispatch(updateUserFailure(data.meassage));
+        dispatch(updateUserFailure(data.message));
         return;
       }
 
       dispatch(updateUserSuccess(data));
       setUpdateSuccess(true);
     } catch (error) {
-      dispatch(updateUserFailure(error.meassage));
+      dispatch(updateUserFailure(error.message));
     }
   };
-
   return (
     <div className='p-3 max-w-lg mx-auto'>
       <h1 className='text-3xl font-semibold text-center my-7'>Profile</h1>
-      <form onSubmit={handleSubmit} className='flex flex-col gap-4 '>
+      <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
         <input
           onChange={(e) => setFile(e.target.files[0])}
           type='file'
@@ -98,17 +94,17 @@ const Profile = () => {
         <img
           onClick={() => fileRef.current.click()}
           src={formData.avatar || currentUser.avatar}
-          alt='Profile'
+          alt='profile'
           className='rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2'
         />
         <p className='text-sm self-center'>
           {fileUploadError ? (
             <span className='text-red-700'>
-              Error Image Upload (image must be less than 2 mb)
+              Error Image upload (image must be less than 2 mb)
             </span>
-          ) : filePercentage > 0 && filePercentage < 100 ? (
-            <span className='text-slate-700'>{`Uploading ${filePercentage}%`}</span>
-          ) : filePercentage === 100 ? (
+          ) : filePerc > 0 && filePerc < 100 ? (
+            <span className='text-slate-700'>{`Uploading ${filePerc}%`}</span>
+          ) : filePerc === 100 ? (
             <span className='text-green-700'>Image successfully uploaded!</span>
           ) : (
             ""
@@ -133,17 +129,16 @@ const Profile = () => {
         <input
           type='password'
           placeholder='password'
+          onChange={handleChange}
           id='password'
           className='border p-3 rounded-lg focus:outline-none'
-          onChange={handleChange}
         />
         <button
           disabled={loading}
-          className='bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-75'>
-          {loading ? "Updating" : "Update"}
+          className='bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80'>
+          {loading ? "Loading..." : "Update"}
         </button>
       </form>
-
       <div className='flex justify-between mt-5'>
         <span className='text-red-700 cursor-pointer'>Delete account</span>
         <span className='text-red-700 cursor-pointer'>Sign out</span>
@@ -151,10 +146,8 @@ const Profile = () => {
 
       <p className='text-red-700 mt-5'>{error ? error : ""}</p>
       <p className='text-green-700 mt-5'>
-        {updateSuccess ? "User updated successfully!" : ""}
+        {updateSuccess ? "User is updated successfully!" : ""}
       </p>
     </div>
   );
-};
-
-export default Profile;
+}
