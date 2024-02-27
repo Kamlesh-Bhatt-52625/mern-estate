@@ -18,7 +18,7 @@ export const deleteListing = async (req, res, next) => {
   }
 
   if (req.user.id !== listing.userRef) {
-    return next(errorHandler(401, "You can only delete your own listing!"));
+    return next(errorHandler(401, "You can only delete your own listings!"));
   }
 
   try {
@@ -34,7 +34,6 @@ export const updateListing = async (req, res, next) => {
   if (!listing) {
     return next(errorHandler(404, "Listing not found!"));
   }
-
   if (req.user.id !== listing.userRef) {
     return next(errorHandler(401, "You can only update your own listings!"));
   }
@@ -86,24 +85,25 @@ export const getListings = async (req, res, next) => {
     }
 
     let type = req.query.type;
+
     if (type === undefined || type === "all") {
       type = { $in: ["sale", "rent"] };
     }
 
-    const searachTerm = req.query.searachTerm || "";
+    const searchTerm = req.query.searchTerm || "";
+
     const sort = req.query.sort || "createdAt";
+
     const order = req.query.order || "desc";
 
     const listings = await Listing.find({
-      name: { $regex: searachTerm, $options: "i" },
+      name: { $regex: searchTerm, $options: "i" },
       offer,
       furnished,
       parking,
       type,
     })
-      .sort({
-        [sort]: order,
-      })
+      .sort({ [sort]: order })
       .limit(limit)
       .skip(startIndex);
 
