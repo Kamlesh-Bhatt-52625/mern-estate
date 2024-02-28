@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useSelector } from "react-redux";
 import SwiperCore from "swiper";
@@ -102,8 +102,8 @@ const Listing = () => {
             <p className='text-2xl font-semibold'>
               {listing.name} - ₹{" "}
               {listing.offer
-                ? listing.discountPrice.toLocaleString("en-US")
-                : listing.regularPrice.toLocaleString("en-US")}
+                ? listing.discountPrice.toLocaleString("en-IN")
+                : listing.regularPrice.toLocaleString("en-IN")}
               {listing.type === "rent" && " / month"}
             </p>
             <p className='flex items-center mt-6 gap-2 text-slate-600  text-sm'>
@@ -117,7 +117,7 @@ const Listing = () => {
 
               {listing.offer && (
                 <p className='bg-green-900 w-full max-w-[200px] text-white text-center p-1 rounded-md'>
-                  ₹{+listing.regularPrice - +listing.discountPrice}
+                  ₹ {+listing.regularPrice - +listing.discountPrice} discount
                 </p>
               )}
             </div>
@@ -153,6 +153,11 @@ const Listing = () => {
                 className='bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 p-3'>
                 Contact landlord
               </button>
+            )}
+            {!currentUser && (
+              <p className='text-lg text-center text-gray-700 underline cursor-pointer m-auto'>
+                <Link to={"/sign-in"}>Sign in to contact the owner!</Link>
+              </p>
             )}
             {contact && <Contact listing={listing} />}
           </div>
